@@ -1,6 +1,6 @@
 # ?? DiskWala Patches
 
-Morphe patches for **DiskWala** `com.diskwalaapp` � remove ads and forced update screen. No root required.
+Morphe patches for **DiskWala** `com.diskwalaapp` — remove ads and forced update screen. No root required.
 
 ## ? About
 
@@ -17,10 +17,23 @@ Or in Morphe Manager ? Sources ? Add ? `https://github.com/kuntal-devrat/diskwal
 ## ?? Patches list
 
 <!-- PATCHES_START EXPANDED -->
+> **[vunspecified](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/vunspecified)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`dev`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
+<details open>
+<summary>ðŸ“¦ DiskWala&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches</summary>
+<br>
 
-<!-- Do not modify this section by hand. The patch list is generated when release.yml creates a new release. -->
+**ðŸŽ¯ Supported versions:**
 
-#### A list of your patches will automatically be shown here after your first patches release is created.
+| 24.5 |
+| :---: |
+
+| ðŸ’Š&nbsp;Patch | ðŸ“œ&nbsp;Description | âš™ï¸&nbsp;Options |
+|----------|----------------|-----------|
+| [Disable ads](#disable-ads) | Stubs AppLovin, AdMob, InMobi and other ad SDKs at the bytecode level to prevent ads from loading without breaking the app. |  |
+| [Disable forced update](#disable-forced-update) | Bypasses PairIP integrity checks, Play Integrity and signature verification to remove the forced update / modded-app screen. |  |
+| [Unlock premium](#unlock-premium) | Makes RevenueCat entitlements appear active so ads-free and premium features are unlocked. |  |
+
+</details>
 
 <!-- PATCHES_END -->
 
@@ -73,6 +86,6 @@ adb logcat | grep -i -E "AppLovin|PlayIntegrity|SignatureCheck|VMRunner"
 
 ## ?? License
 
-GPL-3.0 with Morphe Section 7 restrictions � see [LICENSE](LICENSE) and [NOTICE](NOTICE). **Do not use �Morphe� in fork branding**; describe as �compatible with Morphe�.
+GPL-3.0 with Morphe Section 7 restrictions — see [LICENSE](LICENSE) and [NOTICE](NOTICE). **Do not use “Morphe” in fork branding**; describe as “compatible with Morphe”.
 
 <!-- The patches end tag intentionally above so first release cleans up dev instructions -->
