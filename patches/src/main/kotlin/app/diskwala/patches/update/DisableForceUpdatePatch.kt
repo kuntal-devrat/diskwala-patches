@@ -77,5 +77,21 @@ val disableForceUpdatePatch = bytecodePatch(
                 """
             )
         }
+
+        // 5) PairIP Play-Store license check ("Please Download App From App/Play Store").
+        //    LicenseContentProvider.onCreate triggers LicenseClient.checkLicense which opens
+        //    LicenseActivity and redirects to Google Play. Stub both entry points.
+        runCatching {
+            LicenseClientCheckLicenseFingerprint.method.addInstructions(0, "return-void")
+        }
+        runCatching {
+            LicenseContentProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
     }
 }

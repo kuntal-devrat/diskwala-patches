@@ -80,6 +80,30 @@ internal object PlayIntegrityLambdaRejectFingerprint : Fingerprint(
     parameters = listOf("Lcom/facebook/react/bridge/Promise;", "Ljava/lang/Exception;")
 )
 
+// PairIP license check: LicenseContentProvider.onCreate -> LicenseClient.checkLicense
+// -> LicenseActivity -> Play Store redirect ("Please Download App From App/Play Store").
+internal object LicenseContentProviderOnCreateFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseContentProvider;",
+    name = "onCreate",
+    returnType = "Z",
+    accessFlags = listOf(AccessFlags.PUBLIC),
+    parameters = listOf()
+)
+
+internal object LicenseClientCheckLicenseFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+    name = "checkLicense",
+    returnType = "V",
+    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    parameters = listOf("Landroid/content/Context;"),
+    filters = listOf(
+        methodCall(
+            definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+            name = "initializeLicenseCheck"
+        )
+    )
+)
+
 // MainApplication clinit that triggers StartupLauncher - used as alternative to patch StartupLauncher
 internal object MainApplicationClinitFingerprint : Fingerprint(
     definingClass = "Lcom/diskwalaapp/MainApplication;",
