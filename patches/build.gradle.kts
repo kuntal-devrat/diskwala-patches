@@ -12,20 +12,29 @@ patches {
     }
 }
 
-val patchListGeneratorClasspath: Configuration by configurations.creating
+val patchListGeneratorClasspath = configurations.create("patchListGeneratorClasspath")
 
 dependencies {
-    compileOnly(libs.gson)
+    implementation(libs.morphePatchesLibrary)
+    compileOnly(libs.annotation)
+    compileOnly(libs.guava)
+    compileOnly(libs.androidxJavascriptengine)
+    compileOnly(libs.collections4)
+    compileOnly(libs.lang3)
+    compileOnly(libs.hiddenapi)
     patchListGeneratorClasspath(libs.gson)
 }
 
 tasks {
     register<JavaExec>("generatePatchesList") {
-        description = "Build patch list"
+        description = "Build patch with patch list"
+
         dependsOn(build)
+
         classpath = sourceSets["main"].runtimeClasspath + patchListGeneratorClasspath
         mainClass.set("app.morphe.util.PatchListGeneratorKt")
     }
+
     publish {
         dependsOn("generatePatchesList")
     }
