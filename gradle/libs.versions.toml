@@ -5,4 +5,4 @@ gson = "2.14.0"
 
 [libraries]
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-guava = { module = "com.google.guava:guava", version = "32.1.2-jre" }
+guava = { module = "com.google.guava:guava", version = "33.7.1-jre" }
