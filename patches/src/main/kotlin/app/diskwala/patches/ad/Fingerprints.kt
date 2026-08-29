@@ -36,7 +36,6 @@ internal object InMobiInitProviderFingerprint : Fingerprint(
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
     parameters = listOf(),
     filters = listOf(
-        string("uri"),
         methodCall(
             definingClass = "Lcom/inmobi/sdk/InMobiSdk;",
             name = "initFromContentProvider"
