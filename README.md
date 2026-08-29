@@ -1,23 +1,49 @@
-# ?? DiskWala Patches
+<div align="center">
 
-Morphe patches for **DiskWala** `com.diskwalaapp` — remove ads and forced update screen. No root required.
+# DiskWala Patches for Morphe
 
-## ? About
+**Bytecode patches for DiskWala (`com.diskwalaapp`) — no ads, premium unlocked, no forced update screen.**
 
-Patches for DiskWala that stub ad SDKs (AppLovin, InMobi, AdMob) at the bytecode level and bypass PairIP/Play Integrity checks that enforce `Please update to continue using the app` / `Modded APK Detected` screens.
+Patches are built with [Morphe Patcher](https://github.com/MorpheApp/morphe-patcher) and install directly into the [Morphe](https://morphe.software) app as a patch bundle, exactly like popular bundles such as `piko`.
 
-Patches are built with [Morphe Patcher](https://github.com/MorpheApp/morphe-patcher) and work on `24.5` (`334`) and future versions experimentally.
+[![Release](https://img.shields.io/github/v/release/kuntal-devrat/diskwala-patches?sort=semver&label=release)](https://github.com/kuntal-devrat/diskwala-patches/releases)
+[![Bundles](https://img.shields.io/badge/bundles-.mpp-blueviolet)](https://github.com/kuntal-devrat/diskwala-patches/releases/latest)
+[![License](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
 
-### How to use these patches
+</div>
 
-Click here to add these patches to Morphe: **https://morphe.software/add-source?github=kuntal-devrat/diskwala-patches**
+---
 
-Or in Morphe Manager ? Sources ? Add ? `https://github.com/kuntal-devrat/diskwala-patches`
+## Quick start — install in Morphe
 
-## ?? Patches list
+### Option A — one click
+
+From your phone:
+
+**[Add source to Morphe »](https://morphe.software/add-source?github=kuntal-devrat/diskwala-patches)**
+
+### Option B — manually in the Morphe app
+
+1. Open **Morphe** → **Sources**
+2. Tap **Add** and paste:
+
+```
+https://github.com/kuntal-devrat/diskwala-patches
+```
+
+3. Back on the patches screen, select the **DiskWala Patches** bundle, pick DiskWala `24.5` (or a compatible version) and patch.
+
+No root is required — Morphe builds a signed, patched APK you install over the original app.
+
+> [!TIP]
+> DiskWala ships as an XAPK (base + config splits, ~79 MB). Provide the **base APK** (`com.diskwalaapp.apk`) to Morphe. After patching, reinstall with all original splits via `adb install-multiple`, or repack the XAPK.
+
+---
+
+## Patches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/v1.0.0)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`main`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
+> **[v1.0.1-dev.1](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/v1.0.1-dev.1)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`dev`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
 <details open>
 <summary>ðŸ“¦ DiskWala&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -37,55 +63,100 @@ Or in Morphe Manager ? Sources ? Add ? `https://github.com/kuntal-devrat/diskwal
 
 <!-- PATCHES_END -->
 
-## ? Features
+<details>
+<summary><b>What each patch does — technical description</b></summary>
 
-| Patch | Description |
-|-------|-------------|
-| **Disable ads** | Stubs `AppLovinInitProvider`, `InMobiInitProvider`, `MobileAdsInitProvider` and the React Native `AppLovinMAX` bridge (`loadInterstitial`, `showInterstitial`, `loadRewardedAd`, `showRewardedAd`, `isInterstitialReady` etc.) to return without requesting ads. Promise-based `isReady` calls resolve with `false` so JS does not hang. Safe early-return, no null crashes. |
-| **Unlock premium** | Makes `EntitlementInfo.isActive()` always `true` and `EntitlementInfos.getActive()` return `all` map, so `Buy Subscription to enjoy Ads Free Experience` gate passes. |
-| **Disable forced update** | Bypasses PairIP VM protection (`StartupLauncher.launch` ? `return-void`, `VMRunner.invoke` ? `null`), signature checks (`SignatureCheck.verifyIntegrity` ? no-op, `verifySignatureMatches` ? `true`) and Play Integrity (`PlayIntegrity.requestToken` ? resolve with `diskwala_stub_integrity_token`). The Hermes JS bundle then never receives `forceUpdate` / `Modded APK Detected` signals. |
+#### Disable ads
+- Stubs SDK entry points `com.applovin.sdk.AppLovinInitProvider#onCreate`, `com.inmobi.sdk.InMobiInitProvider#onCreate` and AdMob `MobileAdsInitProvider` to `return true` without initializing the SDKs.
+- Stubs the React Native bridge `com.applovin.reactnative.AppLovinMAXModule`: `initialize`, `loadInterstitial`, `showInterstitial`, `loadRewardedAd`, `showRewardedAd`, `loadAppOpenAd`, `showAppOpenAd`, `createBanner`, `createMRec` all return without touching the ad network.
+- `isInterstitialReady` / `isRewardedAdReady` resolve their JS `Promise` with `false` so the Hermes bundle never hangs waiting for an ad that will never come.
 
-## ?? Getting development started
+#### Unlock premium
+- Forces `com.revenuecat.purchases.EntitlementInfo#isActive()` → `true`.
+- Forces `EntitlementInfos#getActive()` to return all entitlements, clearing the *"Buy Subscription to enjoy Ads Free Experience"* gate.
 
-See [Morphe documentation](https://github.com/MorpheApp/morphe-documentation/blob/main/docs/morphe-development/README.md) and [patcher docs](https://github.com/MorpheApp/morphe-patcher/blob/main/docs/2_1_setup.md#-prepare-the-environment) for setup.
+#### Disable forced update
+- Neutralizes PairIP: `StartupLauncher.launch()` → `return-void`, `VMRunner.invoke()` → `null` (native `executeVM` never runs).
+- `SignatureCheck.verifyIntegrity()` → no-op, `verifySignatureMatches()` → `true`.
+- `com.diskwalaapp.integrity.PlayIntegrityModule.requestToken()` resolves with a stub token (`diskwala_stub_integrity_token`) instead of the real Play Integrity flow — `forceUpdate` / `Modded APK Detected` never fire.
 
-1. Add GitHub PAT with `read:packages` to `~/.gradle/gradle.properties`:
-   ```
-   gpr.user=your_github_username
-   gpr.key=ghp_xxxxxxxxxxxxxxxxxxxx
-   ```
-   or set `GITHUB_ACTOR` / `GITHUB_TOKEN` env.
+All fingerprints are defined in `patches/src/main/kotlin/app/diskwala/patches/**/Fingerprints.kt` and target non-obfuscated class/method signatures, so most updates of DiskWala should keep working experimentally.
 
-2. Build locally:
-   ```bash
-   ./gradlew buildAndroid
-   # ? patches/build/libs/patches-*.mpp
-   ```
-   Test with Morphe Desktop like any other bundle.
+</details>
 
-3. Workflow mirrors template:
-   - **Make all changes to the `dev` branch** ? `fix:` / `feat:` commits create pre-releases.
-   - Merge `dev` ? `main` to create stable release (backmerge handled by CI).
-   - Never push `patches-list.json`, `patches-bundle.json`, `CHANGELOG.md` manually.
+---
 
-## ??? XAPK handling
+## Compatibility
 
-`com.diskwalaapp_24.5.xapk` contains base + splits (`config.arm64_v8a`, `config.en`, `config.xxhdpi`). Provide **base APK** `com.diskwalaapp.apk` to Morphe; after patching reinstall with original splits via `adb install-multiple` or repack XAPK.
+| App | Package | Tested version | Notes |
+|---|---|---|---|
+| DiskWala | `com.diskwalaapp` | `24.5 (334)` | Other versions enabled experimentally |
 
-Patched artifacts from manual `apktool` build:
-- `D:\DiskWala\com.diskwalaapp_24.5-patched.apk` (signed, 64MB)
-- `D:\DiskWala\com.diskwalaapp_24.5-patched.xapk` (79MB)
+Patches are fingerprinted against DiskWala `24.5` (`versionCode 334`, `arm64-v8a`). The bundle declares every newer version as *experimental* — string/opcode-based fingerprints usually survive minor app updates, but verify on a spare build first.
 
-## ?? Verify
+---
+
+## Development
+
+### Requirements
+
+- JDK 21
+- A GitHub personal access token (classic) with `read:packages` scope, in `~/.gradle/gradle.properties`:
+
+  ```properties
+  gpr.user=your_github_username
+  gpr.key=ghp_your_token
+  ```
+
+  (Or set `GITHUB_ACTOR` / `GITHUB_TOKEN` environment variables.) This is required because Morphe publishes its patcher libraries to GitHub Packages.
+
+### Build
 
 ```bash
-adb install-multiple patched_base.apk config.arm64_v8a.apk config.en.apk config.xxhdpi.apk
-adb logcat | grep -i -E "AppLovin|PlayIntegrity|SignatureCheck|VMRunner"
-# Expect: no AdLoader logs, no INTEGRITY_ERROR, no "Executing XrSWhF7qgXWkwZNT"
+./gradlew buildAndroid
+# → patches/build/libs/patches-<version>.mpp
 ```
 
-## ?? License
+The `.mpp` bundle can be loaded directly in the Morphe app or Morphe Desktop CLI for testing.
 
-GPL-3.0 with Morphe Section 7 restrictions — see [LICENSE](LICENSE) and [NOTICE](NOTICE). **Do not use “Morphe” in fork branding**; describe as “compatible with Morphe”.
+### Layout
 
-<!-- The patches end tag intentionally above so first release cleans up dev instructions -->
+```
+patches/
+  build.gradle.kts          ← bundle metadata (name, author, website)
+  src/main/kotlin/app/diskwala/patches/
+    shared/Constants.kt     ← Compatibility declaration
+    ad/                     ← Disable ads patch + fingerprints
+    premium/                ← Unlock premium patch + fingerprints
+    update/                 ← Disable forced update patch + fingerprints
+settings.gradle.kts         ← plugin resolution (mirror + jitpack)
+```
+
+### CI / releases
+
+- Work happens on **`dev`** — `fix:`/`feat:` commits produce `*-dev.*` pre-releases automatically.
+- Merge `dev` → `main` for a stable `vX.Y.Z` release; the `patches-<version>.mpp` asset and `patches-bundle.json` are published by the release workflow.
+- `patches-list.json`, `patches-bundle.json`, `CHANGELOG.md` and the patches table in this README are CI-generated. Do not hand-edit.
+- Dependencies are mirrored to [`kuntal-devrat/registry`](https://github.com/kuntal-devrat/registry) so CI builds resolve without extra GitHub Packages credentials beyond `gpr.*`.
+
+---
+
+## Verification
+
+After installing the patched app:
+
+```bash
+adb logcat | grep -i -E "AppLovin|InMobi|PlayIntegrity|SignatureCheck|VMRunner"
+```
+
+Expected: no ad loader traffic, no `INTEGRITY_ERROR`, no PairIP VM execution (`Executing XrSWhF7qgXWkwZNT`), and no forced-update dialog at launch.
+
+---
+
+## License
+
+[GPL-3.0](LICENSE). Forks of the Morphe ecosystem must follow the Morphe brand terms: do not use the *Morphe* name/logo for branding; describe this project as *compatible with Morphe*.
+
+## Credits
+
+- [Morphe](https://github.com/MorpheApp) — patcher, patch framework and release tooling.

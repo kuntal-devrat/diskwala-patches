@@ -35,26 +35,23 @@ val disableForceUpdatePatch = bytecodePatch(
     // Must run before any ad/premium patches that might depend on stable state
     execute {
         // 1) Prevent PairIP VM from starting - most effective single patch
-        StartupLauncherLaunchFingerprint.method.addInstructions(
-            0,
-            """
-                return-void
-            """
-        )
+        runCatching { StartupLauncherLaunchFingerprint.method.addInstructions(0, "return-void") }
 
         // 2) Defence in depth: if something still calls VMRunner directly, stub it
-        VMRunnerInvokeFingerprint.method.addInstructions(
-            0,
-            """
-                const/4 v0, 0x0
-                return-object v0
-            """
-        )
+        runCatching {
+            VMRunnerInvokeFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x0
+                    return-object v0
+                """
+            )
+        }
 
         // executeVM is native; we cannot add instructions to native, but we can make it non-native
         // by patching the caller. The morphe patcher will replace body; native flag will be cleared
         // when we add instructions. Do it defensively inside try/catch in case fingerprint is native.
-        try {
+        runCatching {
             VMRunnerExecuteVMFingerprint.method.addInstructions(
                 0,
                 """
@@ -62,40 +59,36 @@ val disableForceUpdatePatch = bytecodePatch(
                     return-object v0
                 """
             )
-        } catch (_: Exception) {
-            // Native methods may not be patchable on some dex; ignore - StartupLauncher stub is enough
         }
 
         // 3) Signature checks - always return success
-        SignatureCheckVerifyIntegrityFingerprint.method.addInstructions(
-            0,
-            """
-                return-void
-            """
-        )
-
-        SignatureCheckVerifySignatureMatchesFingerprint.method.addInstructions(
-            0,
-            """
-                const/4 v0, 0x1
-                return v0
-            """
-        )
+        runCatching { SignatureCheckVerifyIntegrityFingerprint.method.addInstructions(0, "return-void") }
+        runCatching {
+            SignatureCheckVerifySignatureMatchesFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
 
         // 4) Play Integrity - immediately resolve Promise with fake token
         //    Original does async Task addOnSuccessListener; we short-circuit to resolve directly
         //    so JS receives a token and proceeds. Using the nonce as token is safe; server only checks non-empty.
-        PlayIntegrityRequestTokenFingerprint.method.addInstructions(
+        runCatching {
+            PlayIntegrityRequestTokenFingerprint.method.addInstructions(
             0,
             """
                 const-string v0, "diskwala_stub_integrity_token"
                 invoke-interface {p3, v0}, Lcom/facebook/react/bridge/Promise;->resolve(Ljava/lang/Object;)V
                 return-void
             """
-        )
+            )
+        }
 
         // 5) Also patch the failure lambda to not reject (defence in depth)
-        try {
+        runCatching {
             PlayIntegrityLambdaRejectFingerprint.method.addInstructions(
                 0,
                 """
@@ -104,6 +97,6 @@ val disableForceUpdatePatch = bytecodePatch(
                     return-void
                 """
             )
-        } catch (_: Exception) {}
+        }
     }
 }

@@ -23,28 +23,25 @@ val unlockPremiumPatch = bytecodePatch(
 
     execute {
         // isActive()Z -> return true without reading field
-        EntitlementInfoIsActiveFingerprint.method.addInstructions(
-            0,
-            """
-                const/4 v0, 0x1
-                return v0
-            """
-        )
+        runCatching {
+            EntitlementInfoIsActiveFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
 
-        // getActive()Ljava/util/Map; -> return all instead of filtered active
-        // Original: return this.active (filtered by isActive). Patch: return this.all
-        // Both fields are private final Map, same type, safe to swap.
-        // We replace iget-object of active with all.
-        // Instead of editing instruction, we just override method to return all.
-        EntitlementInfosGetActiveFingerprint.method.addInstructions(
-            0,
-            """
-                iget-object v0, p0, Lcom/revenuecat/purchases/EntitlementInfos;->all:Ljava/util/Map;
-                return-object v0
-            """
-        )
-
-        // Optional: ensure CustomerInfo.getEntitlements never returns null - already non-null
-        // But we keep fingerprint for future use / documentation
+        // getActive()Ljava/util/Map; -> return `all` instead of filtered `active`
+        runCatching {
+            EntitlementInfosGetActiveFingerprint.method.addInstructions(
+                0,
+                """
+                    iget-object v0, p0, Lcom/revenuecat/purchases/EntitlementInfos;->all:Ljava/util/Map;
+                    return-object v0
+                """
+            )
+        }
     }
 }
