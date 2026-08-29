@@ -8,5 +8,5 @@ jadx_out/
 *.apk
 *.xapk
 
-# local credentials
-gradle.properties
+
+

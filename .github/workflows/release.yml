@@ -27,10 +27,14 @@ jobs:
 
       - name: Write gradle.properties (Morphe registry auth)
         run: |
+          # Credentials go to the user-level file, NOT the repo file
+          # (repo gradle.properties is committed back by semantic-release).
+          mkdir -p ~/.gradle
+          printf 'gpr.user=%s\n' "${{ github.repository_owner }}" >> ~/.gradle/gradle.properties
+          printf 'gpr.key=%s\n' "${{ secrets.MORPHE_PAT }}" >> ~/.gradle/gradle.properties
+          # Repo file committed by semantic-release of template provenance:
           printf 'org.gradle.jvmargs=-Xmx4g\n' > gradle.properties
           printf 'android.useAndroidX=true\n' >> gradle.properties
-          printf 'gpr.user=%s\n' "${{ github.repository_owner }}" >> gradle.properties
-          printf 'gpr.key=%s\n' "${{ secrets.MORPHE_PAT }}" >> gradle.properties
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
