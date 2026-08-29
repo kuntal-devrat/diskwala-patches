@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.0...v1.0.1) (2026-08-29)
+
+### 🐛 Bug Fixes
+
+* InMobi fingerprint too strict; make all fingerprint patches fault-tolerant ([f1955a8](https://github.com/kuntal-devrat/diskwala-patches/commit/f1955a8721770105046f169228eab9f972b1366c))
+
 ## [1.0.1-dev.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.0...v1.0.1-dev.1) (2026-08-29)
 
 ### 🐛 Bug Fixes
