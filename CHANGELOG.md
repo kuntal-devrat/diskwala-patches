@@ -1,3 +1,9 @@
+## [1.0.3](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.2...v1.0.3) (2026-08-29)
+
+### 🐛 Bug Fixes
+
+* bypass PairIP license check redirecting to Play Store ([4186310](https://github.com/kuntal-devrat/diskwala-patches/commit/4186310c4e5633cec65dcecb9d83cb1393c34de2))
+
 ## [1.0.3-dev.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.2...v1.0.3-dev.1) (2026-08-29)
 
 ### 🐛 Bug Fixes
