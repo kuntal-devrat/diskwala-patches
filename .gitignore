@@ -7,3 +7,6 @@ decoded_base/
 jadx_out/
 *.apk
 *.xapk
+
+# local credentials
+gradle.properties
