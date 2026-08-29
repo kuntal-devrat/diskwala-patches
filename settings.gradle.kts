@@ -4,28 +4,14 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         google()
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/MorpheApp/registry")
-            credentials {
-                username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")
-                password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
+        // Mirror of MorpheApp registry artifacts (app.morphe + smali), auth-free via raw.githubusercontent.
+        maven { url = uri("https://raw.githubusercontent.com/kuntal-devrat/registry/main") }
         maven { url = uri("https://jitpack.io") }
     }
 }
 
 plugins {
     id("app.morphe.patches") version "1.3.4"
-}
-
-settings {
-    extensions {
-        defaultNamespace = "app.diskwala.extension"
-
-        proguardFiles(rootProject.projectDir.resolve("extensions/proguard-rules.pro").toString())
-    }
 }
 
 include(":patches")

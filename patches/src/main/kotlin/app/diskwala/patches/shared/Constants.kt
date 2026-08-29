@@ -10,7 +10,7 @@ object Constants {
         name = "DiskWala",
         packageName = "com.diskwalaapp",
         apkFileType = ApkFileType.APK,
-        appIconColor = 0xFF1A73E8.toInt(),
+        appIconColor = 0xFF1A73E8L.toInt() and 0xFFFFFF,
         targets = listOf(
             AppTarget(
                 version = "24.5",
