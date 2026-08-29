@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.1...v1.0.2) (2026-08-29)
+
+### 🐛 Bug Fixes
+
+* remove VMRunner null-stubs - PairIP-transformed call sites crash on System.getProperty(null) ([0b02dfe](https://github.com/kuntal-devrat/diskwala-patches/commit/0b02dfedd6e81f5503ec1954a6a5fc479ab17d54))
+
 ## [1.0.2-dev.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.1...v1.0.2-dev.1) (2026-08-29)
 
 ### 🐛 Bug Fixes
