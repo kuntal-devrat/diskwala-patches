@@ -34,34 +34,14 @@ val disableForceUpdatePatch = bytecodePatch(
 
     // Must run before any ad/premium patches that might depend on stable state
     execute {
-        // 1) Prevent PairIP VM from starting - most effective single patch
+        // 1) Prevent PairIP VM from starting. Once StartupLauncher.launch() is a no-op,
+        //    the PairIP runtime never initializes and all protected methods fall through
+        //    to their original bodies. Do NOT stub VMRunner — its return value is consumed
+        //    by hundreds of build-time-transformed call sites (stubbing it to null crashes
+        //    with NullPointerException at System.getProperty(null)).
         runCatching { StartupLauncherLaunchFingerprint.method.addInstructions(0, "return-void") }
 
-        // 2) Defence in depth: if something still calls VMRunner directly, stub it
-        runCatching {
-            VMRunnerInvokeFingerprint.method.addInstructions(
-                0,
-                """
-                    const/4 v0, 0x0
-                    return-object v0
-                """
-            )
-        }
-
-        // executeVM is native; we cannot add instructions to native, but we can make it non-native
-        // by patching the caller. The morphe patcher will replace body; native flag will be cleared
-        // when we add instructions. Do it defensively inside try/catch in case fingerprint is native.
-        runCatching {
-            VMRunnerExecuteVMFingerprint.method.addInstructions(
-                0,
-                """
-                    const/4 v0, 0x0
-                    return-object v0
-                """
-            )
-        }
-
-        // 3) Signature checks - always return success
+        // 2) Signature checks - always return success
         runCatching { SignatureCheckVerifyIntegrityFingerprint.method.addInstructions(0, "return-void") }
         runCatching {
             SignatureCheckVerifySignatureMatchesFingerprint.method.addInstructions(
@@ -73,9 +53,8 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 4) Play Integrity - immediately resolve Promise with fake token
-        //    Original does async Task addOnSuccessListener; we short-circuit to resolve directly
-        //    so JS receives a token and proceeds. Using the nonce as token is safe; server only checks non-empty.
+        // 3) Play Integrity - immediately resolve Promise with fake token
+        //    so JS receives a token without calling Play services.
         runCatching {
             PlayIntegrityRequestTokenFingerprint.method.addInstructions(
             0,
@@ -87,7 +66,7 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 5) Also patch the failure lambda to not reject (defence in depth)
+        // 4) Also patch the failure lambda to not reject (defence in depth)
         runCatching {
             PlayIntegrityLambdaRejectFingerprint.method.addInstructions(
                 0,
