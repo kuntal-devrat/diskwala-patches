@@ -1,4 +1,4 @@
-## [1.0.5](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.4...v1.0.5) (2026-09-02)
+## [1.0.5-dev.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.4...v1.0.5-dev.1) (2026-09-02)
 
 ### 🐛 Bug Fixes
 

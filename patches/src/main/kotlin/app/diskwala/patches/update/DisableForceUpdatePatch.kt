@@ -5,12 +5,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 
 /**
- * Removes forced update, modded app warnings, and PairIP Play Store license checks.
- * Bypasses:
- * - "Please Download App From App/Play Store."
- * - "Check that Google Play is enabled on your device..."
- * - "Modded APK Detected. Modded App not Allowed."
- * - "newer version is available with improvements and bug fixes. Please update to continue using the app."
+ * Removes forced update, anti-tamper, PairIP licensing, and crashes.
  */
 @Suppress("unused")
 val disableForceUpdatePatch = bytecodePatch(
@@ -36,7 +31,7 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 3) PairIP License Checkers (LicenseContentProvider & LicenseContentProvider1)
+        // 3) PairIP License Content Providers
         runCatching {
             LicenseContentProviderOnCreateFingerprint.method.addInstructions(
                 0,
@@ -76,7 +71,18 @@ val disableForceUpdatePatch = bytecodePatch(
         runCatching { LicenseActivityShowErrorDialogFingerprint.method.addInstructions(0, "return-void") }
         runCatching { LicenseActivityShowPaywallFingerprint.method.addInstructions(0, "return-void") }
 
-        // 6) Play Integrity Token bypass
+        // 6) Preload Info Content Provider
+        runCatching {
+            PreloadInfoContentProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+
+        // 7) Play Integrity Token bypass
         runCatching {
             PlayIntegrityRequestTokenFingerprint.method.addInstructions(
                 0,
@@ -98,7 +104,28 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 7) React Native Shadow Nodes (Switch & TextInput measurement crash-proofing)
+        // 8) BlobCollector nativeInstall stub
+        runCatching {
+            BlobCollectorNativeInstallFingerprint.method.addInstructions(0, "return-void")
+        }
+
+        // 9) DefaultNewArchitectureEntryPoint load stub
+        runCatching {
+            DefaultNewArchitectureEntryPointLoadFingerprint.method.addInstructions(0, "return-void")
+        }
+
+        // 10) FreeRASP native modules stub
+        runCatching {
+            FreeRaspCreateNativeModulesFingerprint.method.addInstructions(
+                0,
+                """
+                    sget-object v0, Ljava/util/Collections;->EMPTY_LIST:Ljava/util/List;
+                    return-object v0
+                """
+            )
+        }
+
+        // 11) React Native Shadow Nodes (Switch & TextInput measurement crash-proofing)
         runCatching {
             ReactSwitchShadowNodeMeasureFingerprint.method.addInstructions(
                 0,
