@@ -43,7 +43,7 @@ No root is required — Morphe builds a signed, patched APK you install over the
 ## Patches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.3](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/v1.0.3)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`main`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
+> **[v1.0.4-dev.2](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/v1.0.4-dev.2)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`dev`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
 <details open>
 <summary>ðŸ“¦ DiskWala&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches</summary>
 <br>
