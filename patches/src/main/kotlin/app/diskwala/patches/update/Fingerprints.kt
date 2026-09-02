@@ -150,3 +150,39 @@ internal object FreeRaspCreateNativeModulesFingerprint : Fingerprint(
     name = "createNativeModules",
     returnType = "Ljava/util/List;"
 )
+
+// 12. SystemProps Null Safety (Prevents "key can't be null" NPE in System.getProperty)
+internal object SystemPropsGetPropertyGFingerprint : Fingerprint(
+    definingClass = "Ldd/G;",
+    name = "b",
+    returnType = "Ljava/lang/String;",
+    parameters = listOf("Ljava/lang/String;")
+)
+
+internal object SystemPropsGetPropertyFFingerprint : Fingerprint(
+    definingClass = "Ldd/F;",
+    name = "d",
+    returnType = "Ljava/lang/String;",
+    parameters = listOf("Ljava/lang/String;")
+)
+
+internal object SystemPropsGetPropertyF2Fingerprint : Fingerprint(
+    definingClass = "Ldd/F;",
+    name = "e",
+    returnType = "Ljava/lang/String;",
+    parameters = listOf("Ljava/lang/String;", "Ljava/lang/String;")
+)
+
+internal object SystemPropsGetPropertyHFingerprint : Fingerprint(
+    definingClass = "Ldd/H;",
+    name = "c",
+    returnType = "Ljava/lang/String;",
+    parameters = listOf("Ljava/lang/String;", "Ljava/lang/String;")
+)
+
+// 13. Firebase Provider (Prevents startup crash if FirebaseInitProvider fails due to uninitialized PairIP strings)
+internal object FirebaseInitProviderOnCreateFingerprint : Fingerprint(
+    definingClass = "Lcom/google/firebase/provider/FirebaseInitProvider;",
+    name = "onCreate",
+    returnType = "Z"
+)
