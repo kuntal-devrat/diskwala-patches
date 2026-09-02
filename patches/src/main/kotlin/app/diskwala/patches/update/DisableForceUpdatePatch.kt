@@ -5,7 +5,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 
 /**
- * Removes forced update, anti-tamper, PairIP licensing, and crashes.
+ * Removes forced update, anti-tamper, PairIP licensing, content provider crashes, and runtime instability.
  */
 @Suppress("unused")
 val disableForceUpdatePatch = bytecodePatch(
@@ -31,7 +31,7 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 3) PairIP License Content Providers
+        // 3) PairIP License Content Providers (LicenseContentProvider & LicenseContentProvider1)
         runCatching {
             LicenseContentProviderOnCreateFingerprint.method.addInstructions(
                 0,
@@ -71,7 +71,7 @@ val disableForceUpdatePatch = bytecodePatch(
         runCatching { LicenseActivityShowErrorDialogFingerprint.method.addInstructions(0, "return-void") }
         runCatching { LicenseActivityShowPaywallFingerprint.method.addInstructions(0, "return-void") }
 
-        // 6) Preload Info Content Provider
+        // 6) AppMetrica PreloadInfo Content Provider (Prevents crash when PairIP VM is not initialized)
         runCatching {
             PreloadInfoContentProviderOnCreateFingerprint.method.addInstructions(
                 0,
@@ -82,7 +82,262 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 7) Play Integrity Token bypass
+        // 7) Firebase & Crashlytics Content Providers
+        runCatching {
+            RNFBCrashlyticsInitProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+        runCatching {
+            FirebaseInitProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+
+        // 8) Ad and Analytics Startup Providers
+        runCatching {
+            BigoAdsProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+        runCatching {
+            VungleProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+        runCatching {
+            IronSourceCrashProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+        runCatching {
+            IronSourceLifecycleProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+        runCatching {
+            IronSourceLevelPlayLifecycleProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+        runCatching {
+            MBComponentLifecycleProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+        runCatching {
+            AppMeasurementContentProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
+                """
+            )
+        }
+
+        // 9) PairIP Application & MainApplication clean startup (Bypasses PairIP Method.invoke crashes)
+        runCatching {
+            PairIPApplicationAttachBaseContextFingerprint.method.addInstructions(
+                0,
+                """
+                    invoke-super {p0, p1}, Landroid/app/Application;->attachBaseContext(Landroid/content/Context;)V
+                    return-void
+                """
+            )
+        }
+        runCatching {
+            MainApplicationOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    invoke-super {p0}, Landroid/app/Application;->onCreate()V
+
+                    sget-object v0, Lcom/facebook/react/soloader/OpenSourceMergedSoMapping;->INSTANCE:Lcom/facebook/react/soloader/OpenSourceMergedSoMapping;
+                    invoke-static {p0, v0}, Lcom/facebook/soloader/SoLoader;->init(Landroid/content/Context;Lcom/facebook/soloader/ExternalSoMapping;)V
+
+                    :try_start_rn
+                    const-string v0, "reactnative"
+                    invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
+                    :try_end_rn
+                    .catch Ljava/lang/Throwable; {:try_start_rn .. :try_end_rn} :catch_rn
+                    goto :after_rn
+                    :catch_rn
+                    :after_rn
+
+                    :try_start_ht
+                    const-string v0, "hermestooling"
+                    invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
+                    :try_end_ht
+                    .catch Ljava/lang/Throwable; {:try_start_ht .. :try_end_ht} :catch_ht
+                    goto :after_ht
+                    :catch_ht
+                    :after_ht
+
+                    :try_start_am
+                    const-string v0, "appmodules"
+                    invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
+                    :try_end_am
+                    .catch Ljava/lang/Throwable; {:try_start_am .. :try_end_am} :catch_am
+                    goto :after_am
+                    :catch_am
+                    :after_am
+
+                    :try_start_qc
+                    const-string v0, "reactnativequickcrypto"
+                    invoke-static {v0}, Ljava/lang/System;->loadLibrary(Ljava/lang/String;)V
+                    :try_end_qc
+                    .catch Ljava/lang/Throwable; {:try_start_qc .. :try_end_qc} :catch_qc
+                    goto :after_qc
+                    :catch_qc
+                    :after_qc
+
+                    :try_start_init
+                    invoke-static {}, Lcom/facebook/react/bridge/ReactNativeJniCommonSoLoader;->staticInit()V
+                    invoke-static {}, Lcom/facebook/react/bridge/BridgeSoLoader;->staticInit()V
+                    :try_end_init
+                    .catch Ljava/lang/Throwable; {:try_start_init .. :try_end_init} :catch_init
+                    goto :after_init
+                    :catch_init
+                    :after_init
+
+                    const/4 v0, 0x0
+                    invoke-static {v0, v0, v0}, Lcom/facebook/react/defaults/DefaultNewArchitectureEntryPoint;->load(ZZZ)V
+
+                    return-void
+                """
+            )
+        }
+        runCatching {
+            MainActivityOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x0
+                    invoke-super {p0, v0}, Lcom/facebook/react/ReactActivity;->onCreate(Landroid/os/Bundle;)V
+                    return-void
+                """
+            )
+        }
+
+        // 9b) VMRunner stub - return null instead of executing PairIP VM programs
+        runCatching {
+            VMRunnerInvokeFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 p0, 0x0
+                    return-object p0
+                """
+            )
+        }
+        runCatching { VMRunnerSetContextFingerprint.method.addInstructions(0, "return-void") }
+
+        // 9c) OpenSourceMergedSoMapping.invokeJniOnload stub
+        runCatching { OpenSourceMergedSoMappingInvokeJniOnloadFingerprint.method.addInstructions(0, "return-void") }
+
+        // 9d) ReactMarker.notifyNativeMarker stub
+        runCatching { ReactMarkerNotifyNativeMarkerFingerprint.method.addInstructions(0, "return-void") }
+
+        // 9e) InspectorFlags stubs
+        runCatching {
+            InspectorFlagsGetFuseboxEnabledFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x0
+                    return v0
+                """
+            )
+        }
+        runCatching {
+            InspectorFlagsGetIsProfilingBuildFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x0
+                    return v0
+                """
+            )
+        }
+
+        // 9f) Arguments.addEntry null-key safety
+        runCatching {
+            ArgumentsAddEntryFingerprint.method.addInstructions(
+                0,
+                """
+                    if-nez p1, :cond_args_key_ok
+                    return-void
+                    :cond_args_key_ok
+                """
+            )
+        }
+
+        // 9g) WritableNativeMap null-key safety
+        runCatching {
+            WritableNativeMapPutMapFingerprint.method.addInstructions(
+                0,
+                """
+                    if-nez p1, :cond_putmap_ok
+                    return-void
+                    :cond_putmap_ok
+                """
+            )
+        }
+        runCatching {
+            WritableNativeMapPutArrayFingerprint.method.addInstructions(
+                0,
+                """
+                    if-nez p1, :cond_putarray_ok
+                    return-void
+                    :cond_putarray_ok
+                """
+            )
+        }
+
+        // 9h) ReactTextInputShadowNode.createInternalEditText safe fallback
+        runCatching {
+            ReactTextInputShadowNodeCreateInternalEditTextFingerprint.method.addInstructions(
+                0,
+                """
+                    invoke-virtual {p0}, Lcom/facebook/react/uimanager/ReactShadowNodeImpl;->getThemedContext()Lcom/facebook/react/uimanager/ThemedReactContext;
+                    move-result-object v0
+                    new-instance v1, Landroid/widget/EditText;
+                    const/4 v2, 0x0
+                    const/4 v3, 0x0
+                    invoke-direct {v1, v0, v2, v3}, Landroid/widget/EditText;-><init>(Landroid/content/Context;Landroid/util/AttributeSet;I)V
+                    return-object v1
+                """
+            )
+        }
+
+        // 10) Play Integrity Token bypass
         runCatching {
             PlayIntegrityRequestTokenFingerprint.method.addInstructions(
                 0,
@@ -104,17 +359,17 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 8) BlobCollector nativeInstall stub
+        // 11) BlobCollector nativeInstall stub
         runCatching {
             BlobCollectorNativeInstallFingerprint.method.addInstructions(0, "return-void")
         }
 
-        // 9) DefaultNewArchitectureEntryPoint load stub
+        // 12) DefaultNewArchitectureEntryPoint load stub
         runCatching {
             DefaultNewArchitectureEntryPointLoadFingerprint.method.addInstructions(0, "return-void")
         }
 
-        // 10) FreeRASP native modules stub
+        // 13) FreeRASP native modules stub
         runCatching {
             FreeRaspCreateNativeModulesFingerprint.method.addInstructions(
                 0,
@@ -125,7 +380,7 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 11) React Native Shadow Nodes (Switch measurement crash-proofing)
+        // 14) React Native Shadow Nodes (Switch measurement crash-proofing)
         runCatching {
             ReactSwitchShadowNodeMeasureFingerprint.method.addInstructions(
                 0,
@@ -139,7 +394,7 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 12) SystemProps Null Safety (Prevents "key can't be null" NPE in System.getProperty when PairIP strings are bypassed)
+        // 15) SystemProps Null Safety (Prevents "key can't be null" NPE in System.getProperty when PairIP strings are bypassed)
         runCatching {
             SystemPropsGetPropertyGFingerprint.method.addInstructions(
                 0,
@@ -179,17 +434,6 @@ val disableForceUpdatePatch = bytecodePatch(
                     if-nez p0, :cond_h_null
                     return-object p1
                     :cond_h_null
-                """
-            )
-        }
-
-        // 13) Firebase Provider startup safety
-        runCatching {
-            FirebaseInitProviderOnCreateFingerprint.method.addInstructions(
-                0,
-                """
-                    const/4 v0, 0x1
-                    return v0
                 """
             )
         }
