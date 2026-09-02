@@ -186,6 +186,27 @@ val nativeLibraryPatch = rawResourcePatch(
                         println("Patched QuickBase64 -> ImageLoader at $i"); break
                     }
                 }
+
+                // The app uses this text as an outlined TextInput label. In
+                // the legacy JS bundle it remains visible after a value is
+                // entered, so replace the label with same-length whitespace
+                // while leaving the input value and behavior unchanged.
+                fun blankAll(needle: ByteArray, replacement: ByteArray) {
+                    var count = 0
+                    for (i in 0..data.size - needle.size) {
+                        if ((0 until needle.size).all { data[i + it] == needle[it] }) {
+                            System.arraycopy(replacement, 0, data, i, replacement.size)
+                            count++
+                        }
+                    }
+                    if (count > 0) println("Removed link label text ($count occurrence(s))")
+                }
+                val label = "Paste DiskWala URL here..."
+                blankAll(label.toByteArray(), ByteArray(label.length) { 0x20 })
+                val labelUtf16 = label.toByteArray(Charsets.UTF_16LE)
+                blankAll(labelUtf16, ByteArray(labelUtf16.size) { if (it % 2 == 0) 0x20 else 0 })
+                raf.seek(0)
+                raf.write(data)
             } finally { raf.close() }
         }
 
