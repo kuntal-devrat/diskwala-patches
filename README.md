@@ -14,6 +14,9 @@ Patches are built with [Morphe Patcher](https://github.com/MorpheApp/morphe-patc
 
 ---
 
+> [!NOTE]
+> **Active Development Notice**: This project is currently under active development. While the core patches (anti-tamper bypass, ad blocking, and premium unlock) are fully functional, some experimental features or secondary flows may occasionally have bugs. We are actively refining and testing improvements. Feedback and bug reports are welcome!
+
 ## Quick start — install in Morphe
 
 ### Option A — one click
