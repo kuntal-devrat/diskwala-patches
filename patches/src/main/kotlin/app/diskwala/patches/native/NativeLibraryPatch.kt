@@ -179,19 +179,8 @@ val nativeLibraryPatch = rawResourcePatch(
             val raf = RandomAccessFile(bundle, "rw")
             try {
                 val data = ByteArray(raf.length().toInt()); raf.readFully(data)
-                val s = "QuickBase64".toByteArray(); val r = "ImageLoader".toByteArray()
-                for (i in 0..data.size - s.size) {
-                    if ((0 until s.size).all { data[i + it] == s[it] }) {
-                        raf.seek(i.toLong()); raf.write(r)
-                        println("Patched QuickBase64 -> ImageLoader at $i"); break
-                    }
-                }
-
-                // The app uses this text as an outlined TextInput label. In
-                // the legacy JS bundle it remains visible after a value is
-                // entered, so replace the label with same-length whitespace
-                // while leaving the input value and behavior unchanged.
-                fun blankAll(needle: ByteArray, replacement: ByteArray) {
+                fun replaceAll(needle: ByteArray, replacement: ByteArray, message: String) {
+                    require(needle.size == replacement.size) { "$message changes byte length" }
                     var count = 0
                     for (i in 0..data.size - needle.size) {
                         if ((0 until needle.size).all { data[i + it] == needle[it] }) {
@@ -199,12 +188,22 @@ val nativeLibraryPatch = rawResourcePatch(
                             count++
                         }
                     }
-                    if (count > 0) println("Removed link label text ($count occurrence(s))")
+                    println("$message: $count occurrence(s)")
                 }
+
+                // Update the in-memory buffer. Writing the file before the
+                // label edit would be overwritten by the final full-buffer
+                // write and silently restore QuickBase64.
+                replaceAll("QuickBase64".toByteArray(), "ImageLoader".toByteArray(), "Patched QuickBase64 -> ImageLoader")
+
+                // The app uses this text as an outlined TextInput label. In
+                // the legacy JS bundle it remains visible after a value is
+                // entered, so replace the label with same-length whitespace
+                // while leaving the input value and behavior unchanged.
                 val label = "Paste DiskWala URL here..."
-                blankAll(label.toByteArray(), ByteArray(label.length) { 0x20 })
+                replaceAll(label.toByteArray(), ByteArray(label.length) { 0x20 }, "Removed link label text (UTF-8)")
                 val labelUtf16 = label.toByteArray(Charsets.UTF_16LE)
-                blankAll(labelUtf16, ByteArray(labelUtf16.size) { if (it % 2 == 0) 0x20 else 0 })
+                replaceAll(labelUtf16, ByteArray(labelUtf16.size) { if (it % 2 == 0) 0x20 else 0 }, "Removed link label text (UTF-16LE)")
                 raf.seek(0)
                 raf.write(data)
             } finally { raf.close() }
