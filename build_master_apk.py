@@ -511,6 +511,32 @@ def main():
         )
         p.write_text(text, encoding="utf-8")
 
+    print("Step 2.19: Patching ReactSwitchShadowNode.smali measure...")
+    for p in DECODED_DIR.rglob("ReactSwitchShadowNode.smali"):
+        text = p.read_text(encoding="utf-8")
+        text = re.sub(
+            r'\.method public measure\(Lcom/facebook/yoga/YogaNode;FLcom/facebook/yoga/YogaMeasureMode;FLcom/facebook/yoga/YogaMeasureMode;\)J.*?\.end method',
+            '''.method public measure(Lcom/facebook/yoga/YogaNode;FLcom/facebook/yoga/YogaMeasureMode;FLcom/facebook/yoga/YogaMeasureMode;)J
+    .locals 2
+    const/16 v0, 0x80
+    const/16 v1, 0x48
+    invoke-static {v0, v1}, Lcom/facebook/yoga/YogaMeasureOutput;->make(II)J
+    move-result-wide v0
+    return-wide v0
+.end method''',
+            text,
+            flags=re.DOTALL
+        )
+        p.write_text(text, encoding="utf-8")
+
+    print("Step 2.20: Sanitizing all XML drawables with @null...")
+    for p in (DECODED_DIR / "res").rglob("*.xml"):
+        content = p.read_text(encoding="utf-8", errors="ignore")
+        orig = content
+        content = content.replace('@null', '@android:color/transparent')
+        if content != orig:
+            p.write_text(content, encoding="utf-8")
+
     print("Step 3: Patching libhermestooling.so...")
     ht_path = lib_arm64 / "libhermestooling.so"
     with zipfile.ZipFile(WORK_DIR / "config.arm64_v8a.apk", 'r') as zf:
