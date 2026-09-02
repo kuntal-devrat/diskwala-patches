@@ -125,7 +125,7 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
-        // 11) React Native Shadow Nodes (Switch & TextInput measurement crash-proofing)
+        // 11) React Native Shadow Nodes (Switch measurement crash-proofing)
         runCatching {
             ReactSwitchShadowNodeMeasureFingerprint.method.addInstructions(
                 0,
@@ -135,6 +135,61 @@ val disableForceUpdatePatch = bytecodePatch(
                     invoke-static {v0, v1}, Lcom/facebook/yoga/YogaMeasureOutput;->make(II)J
                     move-result-wide v0
                     return-wide v0
+                """
+            )
+        }
+
+        // 12) SystemProps Null Safety (Prevents "key can't be null" NPE in System.getProperty when PairIP strings are bypassed)
+        runCatching {
+            SystemPropsGetPropertyGFingerprint.method.addInstructions(
+                0,
+                """
+                    if-nez p0, :cond_g_null
+                    const/4 v0, 0x0
+                    return-object v0
+                    :cond_g_null
+                """
+            )
+        }
+        runCatching {
+            SystemPropsGetPropertyFFingerprint.method.addInstructions(
+                0,
+                """
+                    if-nez p0, :cond_f_null
+                    const/4 v0, 0x0
+                    return-object v0
+                    :cond_f_null
+                """
+            )
+        }
+        runCatching {
+            SystemPropsGetPropertyF2Fingerprint.method.addInstructions(
+                0,
+                """
+                    if-nez p0, :cond_f2_null
+                    return-object p1
+                    :cond_f2_null
+                """
+            )
+        }
+        runCatching {
+            SystemPropsGetPropertyHFingerprint.method.addInstructions(
+                0,
+                """
+                    if-nez p0, :cond_h_null
+                    return-object p1
+                    :cond_h_null
+                """
+            )
+        }
+
+        // 13) Firebase Provider startup safety
+        runCatching {
+            FirebaseInitProviderOnCreateFingerprint.method.addInstructions(
+                0,
+                """
+                    const/4 v0, 0x1
+                    return v0
                 """
             )
         }
