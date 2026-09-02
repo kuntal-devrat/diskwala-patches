@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.0...v1.0.1) (2026-09-02)
+
+### 🐛 Bug Fixes
+
+* **morphe:** add SystemProps null-safety and FirebaseInitProvider stubs to prevent startup crash ([d1a6b4e](https://github.com/kuntal-devrat/diskwala-patches/commit/d1a6b4edf081875d368987b312f272e608d9e856))
+* **morphe:** sync SystemProps and Firebase startup fixes to main ([33a0a78](https://github.com/kuntal-devrat/diskwala-patches/commit/33a0a78e36d35b0a2ec55c8f5d0301dd5164f11b))
+
 ## 1.0.0-dev.1 (2026-09-02)
 
 ### 🐛 Bug Fixes
