@@ -1,3 +1,9 @@
+## [1.0.3](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.2...v1.0.3) (2026-09-02)
+
+### 🐛 Bug Fixes
+
+* **morphe:** preserve Hermes bundle replacements ([c8f0b9e](https://github.com/kuntal-devrat/diskwala-patches/commit/c8f0b9e586c403bf8401f8da91f5287a67195312))
+
 ## [1.0.2](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.1...v1.0.2) (2026-09-02)
 
 ### 🐛 Bug Fixes
