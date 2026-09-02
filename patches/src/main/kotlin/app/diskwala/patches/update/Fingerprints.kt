@@ -175,8 +175,49 @@ internal object AppMeasurementContentProviderOnCreateFingerprint : Fingerprint(
 
 // 10. React Native BlobCollector
 internal object BlobCollectorNativeInstallFingerprint : Fingerprint(
-    definingClass = "Lcom/facebook/react/turbomodule/core/BlobCollector;",
+    definingClass = "Lcom/facebook/react/modules/blob/BlobCollector;",
     name = "nativeInstall",
+    returnType = "V",
+    parameters = listOf("Ljava/lang/Object;", "J")
+)
+
+internal object BlobCollectorInstallLambdaFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/modules/blob/BlobCollector;",
+    name = "install\$lambda\$0",
+    returnType = "V",
+    parameters = listOf(
+        "Lcom/facebook/react/bridge/ReactContext;",
+        "Lcom/facebook/react/modules/blob/BlobModule;"
+    )
+)
+
+internal object OkHttpCipherSuiteComparatorFingerprint : Fingerprint(
+    definingClass = "Lokhttp3/CipherSuite\$Companion\$ORDER_BY_NAME\$1;",
+    name = "compare",
+    returnType = "I",
+    parameters = listOf("Ljava/lang/String;", "Ljava/lang/String;")
+)
+
+internal object TransformAnimatedNodeConstructorFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/animated/TransformAnimatedNode;",
+    name = "<init>",
+    returnType = "V",
+    parameters = listOf(
+        "Lcom/facebook/react/bridge/ReadableMap;",
+        "Lcom/facebook/react/animated/NativeAnimatedNodesManager;"
+    )
+)
+
+internal object GrpcMessageEncodingConstructorFingerprint : Fingerprint(
+    definingClass = "Lnb/v;",
+    name = "<init>",
+    returnType = "V",
+    parameters = listOf("Lnb/u;", "Z", "Lnb/v;")
+)
+
+internal object GrpcDnsResolverStaticInitializerFingerprint : Fingerprint(
+    definingClass = "Lio/grpc/internal/D;",
+    name = "<clinit>",
     returnType = "V"
 )
 
@@ -184,7 +225,67 @@ internal object BlobCollectorNativeInstallFingerprint : Fingerprint(
 internal object DefaultNewArchitectureEntryPointLoadFingerprint : Fingerprint(
     definingClass = "Lcom/facebook/react/defaults/DefaultNewArchitectureEntryPoint;",
     name = "load",
-    returnType = "V"
+    returnType = "V",
+    // The zero/one/two-argument overloads delegate into this actual entrypoint.
+    // Match the three-boolean method specifically so the JNI feature-flag path
+    // cannot be reached after patching.
+    parameters = listOf("Z", "Z", "Z")
+)
+
+// React Native's new-architecture facade delegates these accessors to the
+// feature-flags JNI library, which is intentionally absent from this APK.
+internal object RNEnableBridgelessArchitectureFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/internal/featureflags/ReactNativeNewArchitectureFeatureFlags;",
+    name = "enableBridgelessArchitecture",
+    returnType = "Z"
+)
+
+internal object RNEnableFabricRendererFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/internal/featureflags/ReactNativeNewArchitectureFeatureFlags;",
+    name = "enableFabricRenderer",
+    returnType = "Z"
+)
+
+internal object RNIsNewArchitectureStrictModeEnabledFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/internal/featureflags/ReactNativeNewArchitectureFeatureFlags;",
+    name = "isNewArchitectureStrictModeEnabled",
+    returnType = "Z"
+)
+
+internal object RNUseFabricInteropFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/internal/featureflags/ReactNativeNewArchitectureFeatureFlags;",
+    name = "useFabricInterop",
+    returnType = "Z"
+)
+
+internal object RNUseTurboModuleInteropFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/internal/featureflags/ReactNativeNewArchitectureFeatureFlags;",
+    name = "useTurboModuleInterop",
+    returnType = "Z"
+)
+
+internal object RNUseTurboModulesFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/internal/featureflags/ReactNativeNewArchitectureFeatureFlags;",
+    name = "useTurboModules",
+    returnType = "Z"
+)
+
+internal object RNEnableEagerRootViewAttachmentFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/internal/featureflags/ReactNativeFeatureFlagsCxxAccessor;",
+    name = "enableEagerRootViewAttachment",
+    returnType = "Z"
+)
+
+internal object RNCxxNativeAnimatedEnabledFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/internal/featureflags/ReactNativeFeatureFlagsCxxAccessor;",
+    name = "cxxNativeAnimatedEnabled",
+    returnType = "Z"
+)
+
+internal object ReactInstanceManagerInspectorTargetFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/ReactInstanceManager;",
+    name = "getOrCreateInspectorTarget",
+    returnType = "Lcom/facebook/react/bridge/ReactInstanceManagerInspectorTarget;"
 )
 
 // 12. ReactSwitch & TextInput Shadow Nodes

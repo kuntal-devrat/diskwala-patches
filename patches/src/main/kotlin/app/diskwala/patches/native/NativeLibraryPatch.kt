@@ -21,8 +21,9 @@ val nativeLibraryPatch = rawResourcePatch(
     compatibleWith(COMPATIBILITY_DISKWALA)
 
     execute {
-        val workspace = this.fileWorkspace
-        val libDir = File(workspace, "lib/arm64-v8a")
+        // Native libraries are APK root entries.  They are not exposed through
+        // fileWorkspace on Manager 1.29, so use the arbitrary-file API instead.
+        fun lib(name: String): File = get("lib/arm64-v8a/$name")
 
         fun patchFile(file: File, patches: List<Pair<Long, ByteArray>>) {
             if (!file.exists()) { println("WARN: ${file.name} missing"); return }
@@ -64,7 +65,7 @@ val nativeLibraryPatch = rawResourcePatch(
         val NOP = arm64(0xd503201f)
 
         // === 1. libpairipcore.so ===
-        patchFile(File(libDir, "libpairipcore.so"), listOf(
+        patchFile(lib("libpairipcore.so"), listOf(
             0x8b52cL to arm64(0x528000c0, 0x72a00020, 0xd65f03c0),
             0x6bf70L to arm64(0xd2800000, 0xd65f03c0),
             0x29c34L to RET, 0x29f44L to RET, 0x1a7dcL to RET,
@@ -104,7 +105,7 @@ val nativeLibraryPatch = rawResourcePatch(
         cp += 0x463890L to arm64(0x91003c00, 0x927cec00, 0x90000328, 0xf9404109, 0xb5000069, 0x91040109, 0x8b00012a, 0xf900410a, 0xaa0903e0, 0xd65f03c0, 0xd503201f)
         cp += 0x4638b0L to arm64(0x17ffff78, 0xd503201f, 0xd503201f, 0xd503201f)
         cp += 0x463ad0L to arm64(0xb4000040, 0xd2800028, 0xf9000008, 0xf900041f, 0x52800000, 0xd65f03c0)
-        patchFile(File(libDir, "libcrypto.so"), cp)
+        patchFile(lib("libcrypto.so"), cp)
 
         // === 3. libreactnative.so ===
         val rn = mutableListOf<Pair<Long, ByteArray>>()
@@ -142,7 +143,7 @@ val nativeLibraryPatch = rawResourcePatch(
             for (v in longArrayOf(a,b,c,d)) { for (i in 0..7) { buf[p++] = ((v shr (i*8)) and 0xFF).toByte() } }; return buf }
         rn += 0x599a28L to q(1,1,0,0); rn += 0x599ab0L to q(8,8,0,0x17fe50)
         rn += 0x599cd0L to q(32,8,0,0x18e220); rn += 0x599d90L to q(48,8,0,0); rn += 0x599db0L to q(1,1,0,0)
-        patchFile(File(libDir, "libreactnative.so"), rn)
+        patchFile(lib("libreactnative.so"), rn)
 
         // === 4. libhermestooling.so ===
         val ht = mutableListOf<Pair<Long, ByteArray>>()
@@ -153,10 +154,10 @@ val nativeLibraryPatch = rawResourcePatch(
         htC += listOf(0x528000c0, 0x72a00020, 0xa9417bfd, 0x910083ff, 0xd65f03c0)
         ht += htBase to arm64(*htC.toLongArray())
         nop = htBase + htC.size * 4; while (nop < 0x1eb20) { ht += nop to NOP; nop += 4 }
-        patchFile(File(libDir, "libhermestooling.so"), ht)
+        patchFile(lib("libhermestooling.so"), ht)
 
         // === 5. libhermes.so ===
-        patchFile(File(libDir, "libhermes.so"), (0xc0044..0xc0050 step 4).map { it.toLong() to NOP })
+        patchFile(lib("libhermes.so"), (0xc0044..0xc0050 step 4).map { it.toLong() to NOP })
 
         // === 6. libreactnativequickcrypto.so ===
         val qc = mutableListOf<Pair<Long, ByteArray>>()
@@ -170,10 +171,10 @@ val nativeLibraryPatch = rawResourcePatch(
         nop = qcBase + qcC.size * 4; while (nop < 0x4f1f0) { qc += nop to NOP; nop += 4 }
         qc += 0x6507cL to arm64(0xa9007d1f, 0xd65f03c0)
         qc += 0x64bd4L to arm64(0xa9007d1f, 0xf900091f, 0xd65f03c0)
-        patchFile(File(libDir, "libreactnativequickcrypto.so"), qc)
+        patchFile(lib("libreactnativequickcrypto.so"), qc)
 
         // === 7. Hermes bundle: QuickBase64 -> ImageLoader ===
-        val bundle = File(workspace, "assets/index.android.bundle")
+        val bundle = get("assets/index.android.bundle")
         if (bundle.exists()) {
             val raf = RandomAccessFile(bundle, "rw")
             try {
