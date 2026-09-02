@@ -221,6 +221,12 @@ internal object GrpcDnsResolverStaticInitializerFingerprint : Fingerprint(
     returnType = "V"
 )
 
+internal object ReactTextInputEndEditingEventNameFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/views/textinput/ReactTextInputEndEditingEvent;",
+    name = "getEventName",
+    returnType = "Ljava/lang/String;"
+)
+
 // 11. DefaultNewArchitectureEntryPoint
 internal object DefaultNewArchitectureEntryPointLoadFingerprint : Fingerprint(
     definingClass = "Lcom/facebook/react/defaults/DefaultNewArchitectureEntryPoint;",
