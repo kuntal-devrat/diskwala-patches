@@ -1,26 +1,17 @@
 package app.diskwala.patches.update
 
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.methodCall
-import app.morphe.patcher.opcode
-import app.morphe.patcher.string
-import com.android.tools.smali.dexlib2.AccessFlags
-import com.android.tools.smali.dexlib2.Opcode
 
 /**
- * Fingerprints for forced update / integrity / anti-tamper bypass.
- * Based on decoded smali from DiskWala 24.5 (334):
- * - com.pairip.SignatureCheck.verifyIntegrity / verifySignatureMatches
- * - com.pairip.StartupLauncher.launch + VMRunner.invoke / executeVM
- * - com.diskwalaapp.integrity.PlayIntegrityModule.requestToken
- * - com.facebook.react.bridge.Promise reject paths
+ * Fingerprints for forced update / integrity / PairIP license check bypass.
+ * Direct signatures without brittle methodCall filters to ensure 100% match rate across builds.
  */
 
+// 1. SignatureCheck
 internal object SignatureCheckVerifyIntegrityFingerprint : Fingerprint(
     definingClass = "Lcom/pairip/SignatureCheck;",
     name = "verifyIntegrity",
     returnType = "V",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
     parameters = listOf("Landroid/content/Context;")
 )
 
@@ -28,93 +19,107 @@ internal object SignatureCheckVerifySignatureMatchesFingerprint : Fingerprint(
     definingClass = "Lcom/pairip/SignatureCheck;",
     name = "verifySignatureMatches",
     returnType = "Z",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
     parameters = listOf("Ljava/lang/String;")
 )
 
+// 2. StartupLauncher
 internal object StartupLauncherLaunchFingerprint : Fingerprint(
     definingClass = "Lcom/pairip/StartupLauncher;",
     name = "launch",
-    returnType = "V",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC, AccessFlags.SYNCHRONIZED),
-    parameters = listOf()
+    returnType = "V"
 )
 
-internal object VMRunnerInvokeFingerprint : Fingerprint(
-    definingClass = "Lcom/pairip/VMRunner;",
-    name = "invoke",
-    returnType = "Ljava/lang/Object;",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
-    parameters = listOf("Ljava/lang/String;", "[Ljava/lang/Object;")
-)
-
-internal object VMRunnerExecuteVMFingerprint : Fingerprint(
-    definingClass = "Lcom/pairip/VMRunner;",
-    name = "executeVM",
-    returnType = "Ljava/lang/Object;",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC, AccessFlags.NATIVE),
-    parameters = listOf("[B", "[Ljava/lang/Object;")
-)
-
-internal object PlayIntegrityRequestTokenFingerprint : Fingerprint(
-    definingClass = "Lcom/diskwalaapp/integrity/PlayIntegrityModule;",
-    name = "requestToken",
-    returnType = "V",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
-    parameters = listOf("Ljava/lang/String;", "Ljava/lang/String;", "Lcom/facebook/react/bridge/Promise;"),
-    filters = listOf(
-        methodCall(
-            definingClass = "Lr8/b;",
-            name = "a",
-            parameters = listOf("Landroid/content/Context;")
-        )
-    )
-)
-
-// Fallback: if PlayIntegrity lambda fails, also patch the lambda that rejects
-internal object PlayIntegrityLambdaRejectFingerprint : Fingerprint(
-    definingClass = "Lcom/diskwalaapp/integrity/PlayIntegrityModule;",
-    name = "requestToken\$lambda\$2",
-    returnType = "V",
-    accessFlags = listOf(AccessFlags.PRIVATE, AccessFlags.STATIC, AccessFlags.FINAL),
-    parameters = listOf("Lcom/facebook/react/bridge/Promise;", "Ljava/lang/Exception;")
-)
-
-// PairIP license check: LicenseContentProvider.onCreate -> LicenseClient.checkLicense
-// -> LicenseActivity -> Play Store redirect ("Please Download App From App/Play Store").
+// 3. License Content Providers (LicenseContentProvider & LicenseContentProvider1)
 internal object LicenseContentProviderOnCreateFingerprint : Fingerprint(
     definingClass = "Lcom/pairip/licensecheck/LicenseContentProvider;",
     name = "onCreate",
-    returnType = "Z",
-    accessFlags = listOf(AccessFlags.PUBLIC),
-    parameters = listOf()
+    returnType = "Z"
 )
 
+internal object LicenseContentProvider1OnCreateFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseContentProvider1;",
+    name = "onCreate",
+    returnType = "Z"
+)
+
+// 4. LicenseClient (checkLicense, initializeLicenseCheck, retryOrThrow, showPaywallOrThrow)
 internal object LicenseClientCheckLicenseFingerprint : Fingerprint(
     definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
     name = "checkLicense",
     returnType = "V",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
-    parameters = listOf("Landroid/content/Context;"),
-    filters = listOf(
-        methodCall(
-            definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
-            name = "initializeLicenseCheck"
-        )
-    )
+    parameters = listOf("Landroid/content/Context;")
 )
 
-// MainApplication clinit that triggers StartupLauncher - used as alternative to patch StartupLauncher
-internal object MainApplicationClinitFingerprint : Fingerprint(
-    definingClass = "Lcom/diskwalaapp/MainApplication;",
-    name = "<clinit>",
+internal object LicenseClientInitLicenseCheck1Fingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+    name = "initializeLicenseCheck",
     returnType = "V",
-    accessFlags = listOf(AccessFlags.STATIC),
-    parameters = listOf(),
-    filters = listOf(
-        methodCall(
-            definingClass = "Lcom/pairip/StartupLauncher;",
-            name = "launch"
-        )
-    )
+    parameters = listOf("Landroid/content/Context;")
+)
+
+internal object LicenseClientInitLicenseCheck2Fingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+    name = "initializeLicenseCheck",
+    returnType = "V",
+    parameters = listOf("Z")
+)
+
+internal object LicenseClientRetryOrThrowFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+    name = "retryOrThrow",
+    returnType = "V"
+)
+
+internal object LicenseClientShowPaywallFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+    name = "showPaywallOrThrow",
+    returnType = "V"
+)
+
+// 5. LicenseActivity (onCreate, showErrorDialog, showPaywallAndCloseApp)
+internal object LicenseActivityOnCreateFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseActivity;",
+    name = "onCreate",
+    returnType = "V",
+    parameters = listOf("Landroid/os/Bundle;")
+)
+
+internal object LicenseActivityShowErrorDialogFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseActivity;",
+    name = "showErrorDialog",
+    returnType = "V"
+)
+
+internal object LicenseActivityShowPaywallFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseActivity;",
+    name = "showPaywallAndCloseApp",
+    returnType = "V"
+)
+
+// 6. PlayIntegrity
+internal object PlayIntegrityRequestTokenFingerprint : Fingerprint(
+    definingClass = "Lcom/diskwalaapp/integrity/PlayIntegrityModule;",
+    name = "requestToken",
+    returnType = "V",
+    parameters = listOf("Ljava/lang/String;", "Ljava/lang/String;", "Lcom/facebook/react/bridge/Promise;")
+)
+
+internal object PlayIntegrityLambdaRejectFingerprint : Fingerprint(
+    definingClass = "Lcom/diskwalaapp/integrity/PlayIntegrityModule;",
+    name = "requestToken\$lambda\$2",
+    returnType = "V",
+    parameters = listOf("Lcom/facebook/react/bridge/Promise;", "Ljava/lang/Exception;")
+)
+
+// 7. ReactSwitch & TextInput Shadow Nodes (measure & createInternalEditText)
+internal object ReactSwitchShadowNodeMeasureFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/views/switchview/ReactSwitchShadowNode;",
+    name = "measure",
+    returnType = "J"
+)
+
+internal object ReactTextInputShadowNodeCreateInternalEditTextFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/views/textinput/ReactTextInputShadowNode;",
+    name = "createInternalEditText",
+    returnType = "Landroid/widget/EditText;"
 )
