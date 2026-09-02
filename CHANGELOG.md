@@ -1,3 +1,9 @@
+## [1.0.4-dev.2](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.4-dev.1...v1.0.4-dev.2) (2026-09-02)
+
+### 🐛 Bug Fixes
+
+* **upload:** patch ReactSwitchShadowNode measure and sanitize all XML drawables with [@null](https://github.com/null) placeholders ([115f4a2](https://github.com/kuntal-devrat/diskwala-patches/commit/115f4a21a8339c4fc13610dfc1894f4ece7b9cfe))
+
 ## [1.0.4-dev.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.3...v1.0.4-dev.1) (2026-09-02)
 
 ### 🐛 Bug Fixes
