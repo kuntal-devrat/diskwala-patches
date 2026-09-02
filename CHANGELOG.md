@@ -1,3 +1,9 @@
+## [1.0.4-dev.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.3...v1.0.4-dev.1) (2026-09-02)
+
+### 🐛 Bug Fixes
+
+* **diskwala:** complete end-to-end anti-tamper bypass, OpenSSL PLT resolution, JSI HostObject safety, and UI crash fixes ([c94e035](https://github.com/kuntal-devrat/diskwala-patches/commit/c94e035b960ac7e4abb420e8c2ef9f33b98e82ff))
+
 ## [1.0.3](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.2...v1.0.3) (2026-08-29)
 
 ### 🐛 Bug Fixes
