@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.4",
+  "version": "1.0.5-dev.1",
   "patches": [
     {
       "name": "Disable ads",
@@ -39,7 +39,7 @@
     },
     {
       "name": "Disable forced update",
-      "description": "Bypasses PairIP integrity checks, Play Integrity and signature verification to remove the forced update / modded-app screen.",
+      "description": "Bypasses PairIP license check ('Download from Play Store'), Play Integrity, and signature verification to allow modified and sideloaded app usage.",
       "default": true,
       "dependencies": [],
       "compatiblePackages": [

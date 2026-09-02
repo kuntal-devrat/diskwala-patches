@@ -1,3 +1,9 @@
+## [1.0.5-dev.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.4...v1.0.5-dev.1) (2026-09-02)
+
+### 🐛 Bug Fixes
+
+* **morphe:** update DisableForceUpdatePatch and Fingerprints to directly stub all PairIP LicenseClient, LicenseContentProvider, LicenseActivity, and Switch measurement methods ([a16adbf](https://github.com/kuntal-devrat/diskwala-patches/commit/a16adbf9b87d3af3b01f3da08f0b10eaa6e2f45e))
+
 ## [1.0.4](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.3...v1.0.4) (2026-09-02)
 
 ### 🐛 Bug Fixes

@@ -43,7 +43,7 @@ No root is required — Morphe builds a signed, patched APK you install over the
 ## Patches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.4](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/v1.0.4)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`main`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
+> **[v1.0.5-dev.1](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/v1.0.5-dev.1)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`dev`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
 <details open>
 <summary>ðŸ“¦ DiskWala&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -56,7 +56,7 @@ No root is required — Morphe builds a signed, patched APK you install over the
 | ðŸ’Š&nbsp;Patch | ðŸ“œ&nbsp;Description | âš™ï¸&nbsp;Options |
 |----------|----------------|-----------|
 | [Disable ads](#disable-ads) | Stubs AppLovin, AdMob, InMobi and other ad SDKs at the bytecode level to prevent ads from loading without breaking the app. |  |
-| [Disable forced update](#disable-forced-update) | Bypasses PairIP integrity checks, Play Integrity and signature verification to remove the forced update / modded-app screen. |  |
+| [Disable forced update](#disable-forced-update) | Bypasses PairIP license check ('Download from Play Store'), Play Integrity, and signature verification to allow modified and sideloaded app usage. |  |
 | [Unlock premium](#unlock-premium) | Makes RevenueCat entitlements appear active so ads-free and premium features are unlocked. |  |
 
 </details>
