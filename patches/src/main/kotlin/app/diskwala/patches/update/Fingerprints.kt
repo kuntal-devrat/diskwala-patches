@@ -3,8 +3,7 @@ package app.diskwala.patches.update
 import app.morphe.patcher.Fingerprint
 
 /**
- * Fingerprints for forced update / integrity / PairIP license check bypass.
- * Direct signatures without brittle methodCall filters to ensure 100% match rate across builds.
+ * Fingerprints for forced update, anti-tamper, PairIP license checks, and runtime stability.
  */
 
 // 1. SignatureCheck
@@ -22,7 +21,7 @@ internal object SignatureCheckVerifySignatureMatchesFingerprint : Fingerprint(
     parameters = listOf("Ljava/lang/String;")
 )
 
-// 2. StartupLauncher
+// 2. StartupLauncher & VMRunner
 internal object StartupLauncherLaunchFingerprint : Fingerprint(
     definingClass = "Lcom/pairip/StartupLauncher;",
     name = "launch",
@@ -111,7 +110,28 @@ internal object PlayIntegrityLambdaRejectFingerprint : Fingerprint(
     parameters = listOf("Lcom/facebook/react/bridge/Promise;", "Ljava/lang/Exception;")
 )
 
-// 7. ReactSwitch & TextInput Shadow Nodes (measure & createInternalEditText)
+// 7. PreloadInfoContentProvider
+internal object PreloadInfoContentProviderOnCreateFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/preload/PreloadInfoContentProvider;",
+    name = "onCreate",
+    returnType = "Z"
+)
+
+// 8. React Native BlobCollector
+internal object BlobCollectorNativeInstallFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/turbomodule/core/BlobCollector;",
+    name = "nativeInstall",
+    returnType = "V"
+)
+
+// 9. DefaultNewArchitectureEntryPoint
+internal object DefaultNewArchitectureEntryPointLoadFingerprint : Fingerprint(
+    definingClass = "Lcom/facebook/react/defaults/DefaultNewArchitectureEntryPoint;",
+    name = "load",
+    returnType = "V"
+)
+
+// 10. ReactSwitch & TextInput Shadow Nodes
 internal object ReactSwitchShadowNodeMeasureFingerprint : Fingerprint(
     definingClass = "Lcom/facebook/react/views/switchview/ReactSwitchShadowNode;",
     name = "measure",
@@ -122,4 +142,11 @@ internal object ReactTextInputShadowNodeCreateInternalEditTextFingerprint : Fing
     definingClass = "Lcom/facebook/react/views/textinput/ReactTextInputShadowNode;",
     name = "createInternalEditText",
     returnType = "Landroid/widget/EditText;"
+)
+
+// 11. FreeRASP
+internal object FreeRaspCreateNativeModulesFingerprint : Fingerprint(
+    definingClass = "LEa/i;",
+    name = "createNativeModules",
+    returnType = "Ljava/util/List;"
 )
