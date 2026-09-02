@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.1...v1.0.2) (2026-09-02)
+
+### 🐛 Bug Fixes
+
+* **morphe:** hide consumed link label ([bfd64c3](https://github.com/kuntal-devrat/diskwala-patches/commit/bfd64c3d631216cd6e28d6cc8756a2246f98f607))
+
 ## [1.0.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.0...v1.0.1) (2026-09-02)
 
 ### 🐛 Bug Fixes
