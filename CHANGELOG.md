@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/kuntal-devrat/diskwala-patches/compare/v1.0.0...v1.0.1) (2026-09-02)
+
+### 🐛 Bug Fixes
+
+* **morphe:** handle legacy text input event ([2f74d59](https://github.com/kuntal-devrat/diskwala-patches/commit/2f74d5928a5d71d28680160b0f6d64c79c1f1c82))
+
 ## 1.0.0 (2026-09-02)
 
 ### 🐛 Bug Fixes
