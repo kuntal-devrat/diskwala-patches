@@ -14,6 +14,9 @@ Patches are built with [Morphe Patcher](https://github.com/MorpheApp/morphe-patc
 
 ---
 
+> [!NOTE]
+> **Active Development Notice**: This project is currently under active development. While the core patches (anti-tamper bypass, ad blocking, and premium unlock) are fully functional, some experimental features or secondary flows may occasionally have bugs. We are actively refining and testing improvements. Feedback and bug reports are welcome!
+
 ## Quick start — install in Morphe
 
 ### Option A — one click
@@ -43,7 +46,7 @@ No root is required — Morphe builds a signed, patched APK you install over the
 ## Patches
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/v1.0.0)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`main`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
+> **[v1.0.0-dev.1](https://github.com/kuntal-devrat/diskwala-patches/releases/tag/v1.0.0-dev.1)**&nbsp;&nbsp;â€¢&nbsp;&nbsp;`dev`&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches total
 <details open>
 <summary>ðŸ“¦ DiskWala&nbsp;&nbsp;â€¢&nbsp;&nbsp;3 patches</summary>
 <br>
