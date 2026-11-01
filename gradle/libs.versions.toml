@@ -6,7 +6,7 @@ gson = "2.14.0"
 annotation = "1.10.0"
 guava = "32.1.2-jre"
 collections4 = "4.6.0"
-lang3 = "3.20.0"
+lang3 = "3.21.0"
 hiddenapi = "6.1"
 
 [libraries]
