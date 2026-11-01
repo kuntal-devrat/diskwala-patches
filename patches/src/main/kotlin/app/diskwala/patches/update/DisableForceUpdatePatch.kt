@@ -479,6 +479,16 @@ val disableForceUpdatePatch = bytecodePatch(
             )
         }
 
+        // The bundled legacy JS event table does not register topEndEditing.
+        // Map this native-only event to the legacy event understood by that
+        // bundle instead of crashing the React bridge.
+        runCatching {
+            ReactTextInputEndEditingEventNameFingerprint.method.addInstructions(
+                0,
+                "const-string v0, \"topChange\"\nreturn-object v0"
+            )
+        }
+
         // 12) DefaultNewArchitectureEntryPoint load stub
         runCatching {
             DefaultNewArchitectureEntryPointLoadFingerprint.method.addInstructions(0, "return-void")
